@@ -1,2 +1,2 @@
-export const testingPackage: 'browser-extension-kit/testing' =
-	'browser-extension-kit/testing';
+export { makeFakePortHub } from './fake-port-hub';
+export type { FakePortHub } from './fake-port-hub';
