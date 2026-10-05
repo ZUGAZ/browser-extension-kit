@@ -1,0 +1,6 @@
+msg=$(sed '/^#/d;/^$/d' "$1")
+if [ -z "$msg" ]; then
+	echo "Aborting: commit message is empty after stripping comments"
+	exit 1
+fi
+pnpm commitlint --edit $1

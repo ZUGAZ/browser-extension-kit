@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - esbuild
+
+peerDependencyRules:
+  allowedVersions:
+    '@effect/vitest>vitest': '4'

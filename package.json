@@ -1,0 +1,62 @@
+{
+	"name": "browser-extension-kit",
+	"version": "0.1.0",
+	"type": "module",
+	"sideEffects": false,
+	"description": "Effect helpers for Chrome extensions (Manifest V3)",
+	"author": "RZUGA <z.zuga.a@gmail.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ZUGAZ/browser-extension-kit.git"
+	},
+	"packageManager": "pnpm@10.28.2",
+	"exports": {
+		"./messaging": "./src/messaging/index.ts",
+		"./testing": "./src/testing/index.ts"
+	},
+	"files": [
+		"src",
+		"LICENSE",
+		"README.md",
+		"AGENTS.md"
+	],
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"lint-staged": "lint-staged",
+		"hooks": "husky"
+	},
+	"peerDependencies": {
+		"@effect/platform": "^0.97.1",
+		"@effect/rpc": "^0.76.2",
+		"effect": "^3.22.1"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^20.4.2",
+		"@commitlint/config-conventional": "^20.4.2",
+		"@effect/language-service": "^0.80.0",
+		"@effect/platform": "^0.97.1",
+		"@effect/rpc": "^0.76.2",
+		"@effect/vitest": "0.30.0",
+		"@eslint/js": "^9.39.2",
+		"effect": "^3.22.1",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"fast-check": "^4.5.3",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.3.3",
+		"prettier": "^3.8.1",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.56.0",
+		"vitest": "^4.0.18"
+	},
+	"lint-staged": {
+		"*.{ts,js,json,md}": "prettier --write"
+	}
+}
