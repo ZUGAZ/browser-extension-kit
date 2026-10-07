@@ -1,10 +1,20 @@
-import { Deferred, Effect, Layer, Logger, Ref, Schema, Stream } from 'effect';
+import {
+	Deferred,
+	Effect,
+	HashMap,
+	Layer,
+	Logger,
+	Ref,
+	Schema,
+	Stream,
+} from 'effect';
 import * as rpc from '@effect/rpc/Rpc';
 import * as rpcGroup from '@effect/rpc/RpcGroup';
 
 import { Caller, PortCaller } from './caller';
 import { Endpoint } from './endpoint';
 import { PortConnector } from './port-connector';
+import { PortInfo, watchPresence } from './presence';
 
 export class EchoRejected extends Schema.TaggedError<EchoRejected>()(
 	'EchoRejected',
@@ -44,6 +54,10 @@ export const ExampleRpcs = rpcGroup
 export const silentLogger = Logger.replace(Logger.defaultLogger, Logger.none);
 
 const settleSteps = 64;
+
+export const presentWhere = (
+	predicate: (presence: HashMap.HashMap<Endpoint, PortInfo>) => boolean,
+) => watchPresence.pipe(Stream.filter(predicate), Stream.runHead);
 
 export const settle: Effect.Effect<void> = Effect.gen(function* () {
 	for (let step = 0; step < settleSteps; step++) {

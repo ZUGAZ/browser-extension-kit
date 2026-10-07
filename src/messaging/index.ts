@@ -24,8 +24,11 @@ export { PortConnector } from './port-connector';
 export type { AcceptedPort, PortHandle } from './port-connector';
 export { Caller, PortCaller } from './caller';
 export { PortPeers } from './port-peers';
+export { layerPresence, PortInfo, Presence, watchPresence } from './presence';
 export { layerPortServer } from './port-rpc-server';
 export { makeBackgroundClient, makeContentClient } from './port-rpc-client';
+export { makeContentClients } from './content-clients';
+export type { ContentClients } from './content-clients';
 export {
 	defaultRequestTimeout,
 	PortRpcError,
