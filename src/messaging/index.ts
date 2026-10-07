@@ -26,7 +26,12 @@ export { Caller, PortCaller } from './caller';
 export { PortPeers } from './port-peers';
 export { layerPresence, PortInfo, Presence, watchPresence } from './presence';
 export { layerPortServer } from './port-rpc-server';
+export { ClientConnection } from './client-connection';
 export { makeBackgroundClient, makeContentClient } from './port-rpc-client';
+export type { BackgroundClient } from './port-rpc-client';
+export { StateStatus, subscribeState } from './subscribe-state';
+export { watchState } from './watch-state';
+export type { WatchStateOptions } from './watch-state';
 export { makeContentClients } from './content-clients';
 export type { ContentClients } from './content-clients';
 export {

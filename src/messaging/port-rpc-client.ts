@@ -1,12 +1,13 @@
-import { Duration, Effect, Option, Schedule, type Scope } from 'effect';
+import { Duration, Effect, Option, Schedule, Stream, type Scope } from 'effect';
 import type * as rpc from '@effect/rpc/Rpc';
 import * as rpcClient from '@effect/rpc/RpcClient';
 import { RpcClientError } from '@effect/rpc/RpcClientError';
 import * as rpcGroup from '@effect/rpc/RpcGroup';
 
+import type { ClientConnection } from './client-connection';
 import type { Disconnected } from './connection-errors';
 import { Background, type Content } from './endpoint';
-import { PageLifecycleNone } from './page-lifecycle';
+import { PageLifecycleNone, type PageLifecycle } from './page-lifecycle';
 import {
 	makePortClientProtocol,
 	makePortClientProtocolWithControl,
@@ -17,10 +18,19 @@ import {
 	defaultStableAfter,
 } from './reconnect-schedule';
 
+export interface BackgroundClient<Rpcs extends rpc.Any> {
+	readonly client: rpcClient.RpcClient<Rpcs, RpcClientError>;
+	readonly connection: Stream.Stream<ClientConnection>;
+}
+
 /**
+ * Reconnecting client for a port opened toward background.
+ *
+ * `connection` feeds `subscribeState`. Plain calls need only `client`.
+ *
  * Wrap each call in `withPortErrors` and each stream in `withPortErrorsStream`.
  * A dropped port ends in-flight effects and streams with `Disconnected`.
- * This client does not resubscribe.
+ * This client does not resubscribe on its own.
  *
  * Reconnects while the page is in the foreground. Pauses in the back/forward
  * cache and reconnects when the page is restored. Stops for good on
@@ -33,20 +43,25 @@ export const makeBackgroundClient = <Rpcs extends rpc.Any>(
 		readonly reconnectSchedule?: Schedule.Schedule<unknown, Disconnected>;
 		readonly stableAfter?: Duration.DurationInput;
 	},
-) =>
-	rpcClient.make(group, { spanPrefix: 'PortRpcClient' }).pipe(
-		Effect.provideServiceEffect(
-			rpcClient.Protocol,
-			makePortClientProtocol({
-				target: new Background(),
-				name: options.name,
-				reconnect: Option.some({
-					schedule: options.reconnectSchedule ?? defaultReconnectSchedule,
-					stableAfter: options.stableAfter ?? defaultStableAfter,
-				}),
+): Effect.Effect<
+	BackgroundClient<Rpcs>,
+	never,
+	PortConnector | PageLifecycle | Scope.Scope | rpc.MiddlewareClient<Rpcs>
+> =>
+	Effect.gen(function* () {
+		const { protocol, connection } = yield* makePortClientProtocol({
+			target: new Background(),
+			name: options.name,
+			reconnect: Option.some({
+				schedule: options.reconnectSchedule ?? defaultReconnectSchedule,
+				stableAfter: options.stableAfter ?? defaultStableAfter,
 			}),
-		),
-	);
+		});
+		const client = yield* rpcClient
+			.make(group, { spanPrefix: 'PortRpcClient' })
+			.pipe(Effect.provideService(rpcClient.Protocol, protocol));
+		return { client, connection };
+	});
 
 export const makeContentClientSession = <Rpcs extends rpc.Any>(
 	group: rpcGroup.RpcGroup<Rpcs>,

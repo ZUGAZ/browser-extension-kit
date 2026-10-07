@@ -75,7 +75,7 @@ describe('port rpc client', () => {
 			const handlers = yield* makeExampleHandlers;
 			const lifecycle = yield* makeFakePageLifecycle;
 			const connects = yield* Ref.make(0);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: quickSchedule,
 			}).pipe(
@@ -169,7 +169,7 @@ describe('port rpc client', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: quickSchedule,
 			}).pipe(
@@ -232,7 +232,7 @@ describe('port rpc client', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: quickSchedule,
 			}).pipe(
@@ -270,7 +270,7 @@ describe('port rpc client', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: quickSchedule,
 			}).pipe(
@@ -307,7 +307,7 @@ describe('port rpc client', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: quickSchedule,
 			}).pipe(
@@ -352,7 +352,7 @@ describe('port rpc client', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: quickSchedule,
 			}).pipe(
@@ -397,7 +397,7 @@ describe('port rpc client', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(frame)),
@@ -442,7 +442,7 @@ describe('port rpc client', () => {
 			const hub = yield* makeFakePortHub;
 			const lifecycle = yield* makeFakePageLifecycle;
 			const connects = yield* Ref.make(0);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 				reconnectSchedule: Schedule.recurs(2),
 			}).pipe(

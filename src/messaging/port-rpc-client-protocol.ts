@@ -17,6 +17,7 @@ import {
 import type { FromClientEncoded } from '@effect/rpc/RpcMessage';
 import * as rpcClient from '@effect/rpc/RpcClient';
 
+import { ClientConnection } from './client-connection';
 import {
 	Disconnected,
 	ExtensionContextInvalidated,
@@ -67,6 +68,7 @@ export const makePortClientProtocolWithControl = (options: {
 }): Effect.Effect<
 	{
 		readonly protocol: rpcClient.Protocol['Type'];
+		readonly connection: Stream.Stream<ClientConnection>;
 		readonly release: (error: Disconnected) => Effect.Effect<void>;
 		readonly awaitTerminated: Effect.Effect<void>;
 		readonly isTerminated: Effect.Effect<boolean>;
@@ -181,6 +183,9 @@ export const makePortClientProtocolWithControl = (options: {
 						// Fail in-flight calls before interrupting the reader.
 						// Interrupting it first ends a stream mailbox with that
 						// interrupt, and a later protocol error cannot replace it.
+						// Set Connecting before failInFlight. subscribeState reads
+						// the connection after Disconnected and must not resubmit
+						// on the dead handle.
 						if (Exit.isFailure(closed)) {
 							yield* SubscriptionRef.set(state, Connecting());
 							const failure = Cause.failureOption(closed.cause);
@@ -317,7 +322,17 @@ export const makePortClientProtocolWithControl = (options: {
 		const isTerminated = SubscriptionRef.get(state).pipe(
 			Effect.map($is('Terminated')),
 		);
-		return { protocol, release, awaitTerminated, isTerminated };
+		const connection = state.changes.pipe(
+			Stream.map(
+				$match({
+					Connecting: () => ClientConnection.Connecting(),
+					Connected: () => ClientConnection.Connected(),
+					Terminated: ({ error }) => ClientConnection.Terminated({ error }),
+				}),
+			),
+			Stream.changes,
+		);
+		return { protocol, connection, release, awaitTerminated, isTerminated };
 	});
 
 export const makePortClientProtocol = (options: {
@@ -328,10 +343,16 @@ export const makePortClientProtocol = (options: {
 		readonly stableAfter: Duration.DurationInput;
 	}>;
 }): Effect.Effect<
-	rpcClient.Protocol['Type'],
+	{
+		readonly protocol: rpcClient.Protocol['Type'];
+		readonly connection: Stream.Stream<ClientConnection>;
+	},
 	never,
 	PortConnector | PageLifecycle | Scope.Scope
 > =>
 	makePortClientProtocolWithControl(options).pipe(
-		Effect.map((control) => control.protocol),
+		Effect.map((control) => ({
+			protocol: control.protocol,
+			connection: control.connection,
+		})),
 	);

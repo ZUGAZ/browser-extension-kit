@@ -82,7 +82,7 @@ describe('port rpc server', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(new Popup())),
@@ -106,7 +106,7 @@ describe('port rpc server', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(new Popup())),
@@ -133,7 +133,7 @@ describe('port rpc server', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(new Popup())),
@@ -163,7 +163,7 @@ describe('port rpc server', () => {
 					Effect.provide(hub.layerFor(endpoint)),
 					Effect.provide(PageLifecycleNone),
 					Effect.provide(silentLogger),
-					Effect.flatMap((client) =>
+					Effect.flatMap(({ client }) =>
 						client.WhoAmI(undefined).pipe(withPortErrors()),
 					),
 				);
@@ -215,7 +215,7 @@ describe('port rpc server', () => {
 				),
 			);
 			const peers = Context.get(context, PortPeers);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(new Popup())),
@@ -304,7 +304,7 @@ describe('port rpc server', () => {
 					Layer.provide(silentLogger),
 				),
 			);
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(new Popup())),
@@ -341,7 +341,7 @@ describe('port rpc server', () => {
 			const answer = yield* Effect.promise(() =>
 				runtime.runPromise(
 					makeBackgroundClient(ExampleRpcs, { name: rpcName }).pipe(
-						Effect.flatMap((client) =>
+						Effect.flatMap(({ client }) =>
 							client.Echo({ text: 'hi' }).pipe(withPortErrors()),
 						),
 						Effect.provide(hub.layerFor(new Popup())),
@@ -353,7 +353,7 @@ describe('port rpc server', () => {
 			expect(answer).toBe('hi');
 			const hang = runtime.runFork(
 				makeBackgroundClient(ExampleRpcs, { name: rpcName }).pipe(
-					Effect.flatMap((client) =>
+					Effect.flatMap(({ client }) =>
 						client.Hang(undefined).pipe(withPortErrors()),
 					),
 					Effect.provide(hub.layerFor(new Popup())),
@@ -388,7 +388,7 @@ describe('port rpc server', () => {
 					Layer.provide(silentLogger),
 				),
 			).pipe(Effect.provideService(Scope.Scope, serverScope));
-			const client = yield* makeBackgroundClient(ExampleRpcs, {
+			const { client } = yield* makeBackgroundClient(ExampleRpcs, {
 				name: rpcName,
 			}).pipe(
 				Effect.provide(hub.layerFor(new Popup())),
